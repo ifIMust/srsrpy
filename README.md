@@ -41,5 +41,4 @@ except:
 
 
 ## Further plans
-- Publish the client to the PyPI testing server
 - Publish the client to the PyPI production server
