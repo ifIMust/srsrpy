@@ -22,4 +22,4 @@ jobs:
     - name: Build with Hatch
       run: hatch build
     - name: Publish
-      run: hatch publish --repo https://test.pypi.org --auth ${{ secrets.SRSRPY_TEST_TOKEN }}
+      run: hatch publish --repo https://test.pypi.org --user __token__ --auth ${{ secrets.SRSRPY_TEST_TOKEN }}
