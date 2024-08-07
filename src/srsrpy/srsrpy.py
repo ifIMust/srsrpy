@@ -1,6 +1,6 @@
 import requests
 from threading import Thread, Event
-import time
+
 
 class ServiceRegistryClient:
     def __init__(self, server_address, client_name, client_address):
@@ -14,7 +14,6 @@ class ServiceRegistryClient:
         self.heartbeat_thread = None
         self.stop = None
 
-
     def register(self):
         reg_data = {'name': self.client_name, 'address': self.client_address}
         r = requests.post(self.server_address + "/register", json=reg_data)
@@ -27,18 +26,16 @@ class ServiceRegistryClient:
                 self.heartbeat_thread = Thread(target=self.keep_alive)
                 self.heartbeat_thread.start()
 
-
     def deregister(self):
         self.stop.set()
         self.heartbeat_thread.join()
         self.is_registered = False
-        
         dereg_data = {'id': self.client_id}
         requests.post(self.server_address + "/deregister", json=dereg_data)
-
 
     def keep_alive(self):
         heartbeat_data = {'id': self.client_id}
         while not self.stop.is_set():
             self.stop.wait(self.heartbeat_interval_seconds)
-            requests.post(self.server_address + "/heartbeat", json=heartbeat_data)
+            requests.post(self.server_address + "/heartbeat",
+                          json=heartbeat_data)
