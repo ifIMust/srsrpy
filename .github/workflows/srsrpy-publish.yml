@@ -1,0 +1,25 @@
+name: srsrpy deploy
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install Hatch
+      uses: pypa/hatch@install
+    - name: Build with Hatch
+      run: hatch build
+    - name: Publish
+      run: hatch publish --repo https://test.pypi.org --auth ${{ secrets.SRSRPY_TEST_TOKEN }}
