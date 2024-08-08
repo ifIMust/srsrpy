@@ -38,7 +38,8 @@ class ServiceRegistryClient:
             self.is_registered = False
             dereg_data = {'id': self.client_id}
             try:
-                requests.post(self.server_address + "/deregister", json=dereg_data)
+                requests.post(self.server_address + "/deregister",
+                              json=dereg_data)
             except requests.exceptions.ConnectionError:
                 pass
 
