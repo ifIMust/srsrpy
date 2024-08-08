@@ -36,6 +36,7 @@ class ServiceRegistryClient:
     def keep_alive(self):
         heartbeat_data = {'id': self.client_id}
         while not self.stop.is_set():
-            self.stop.wait(self.heartbeat_interval_seconds)
-            requests.post(self.server_address + "/heartbeat",
-                          json=heartbeat_data)
+            stop_flag = self.stop.wait(self.heartbeat_interval_seconds)
+            if not stop_flag:
+                requests.post(self.server_address + "/heartbeat",
+                              json=heartbeat_data)
