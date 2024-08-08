@@ -8,11 +8,12 @@ This is the Python client for [srsr](https://github.com/ifIMust/srsr).
 
 ### Typical
 ```
-import srsrpy
+from srsrpy import srsrpy
 
 # Store the client object for the lifetime of the service
-c = ServiceRegistryClient('http://server.address.com:8080', 'service_name', 'http://client.address.net:3333')
-c.register()
+c = srsrpy.ServiceRegistryClient('http://server.address.com:8080', 'service_name', 'http://client.address.net:3333')
+# Returns True if registered
+success = c.register()
 
 # Carry on with the service duties. Heartbeats will be sent at the default interval.
 
@@ -42,3 +43,4 @@ except:
 
 ## Further plans
 - Publish the client to the PyPI production server
+- Handle failed heartbeat, by stopping the thread.

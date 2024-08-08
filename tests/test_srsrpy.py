@@ -56,3 +56,33 @@ def test_heartbeat(client):
             
         with HTTMock(deregister_mock):
             client.deregister()
+
+
+def test_register_doesnt_throw_connectionerror(client):
+    success = client.register()
+    assert not success
+
+
+def test_deregister_not_registered(client):
+    client.deregister()
+
+
+def test_deregister_doesnt_throw_connectionerror(client):
+    with HTTMock(register_mock):
+        client.register()
+
+    client.deregister()
+
+
+def test_heartbeat_doesnt_throw_connectionerror(client):
+    client.heartbeat_interval_seconds = 0.01
+
+    with HTTMock(register_mock):
+        client.register()
+
+    # Wait for a heartbeat, which should fail without throwing
+    heart_event.clear()
+    heartbeat_sent = heart_event.wait(.05)
+
+    with HTTMock(deregister_mock):
+        client.deregister()

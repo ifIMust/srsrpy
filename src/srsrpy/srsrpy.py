@@ -16,27 +16,39 @@ class ServiceRegistryClient:
 
     def register(self):
         reg_data = {'name': self.client_name, 'address': self.client_address}
-        r = requests.post(self.server_address + "/register", json=reg_data)
-        if r.status_code == requests.codes.ok:
-            resp_json = r.json()
-            if 'id' in resp_json:
-                self.client_id = resp_json['id']
-                self.is_registered = True
-                self.stop = Event()
-                self.heartbeat_thread = Thread(target=self.keep_alive)
-                self.heartbeat_thread.start()
+        try:
+            r = requests.post(self.server_address + "/register", json=reg_data)
+            if r.status_code == requests.codes.ok:
+                resp_json = r.json()
+                if 'id' in resp_json:
+                    self.client_id = resp_json['id']
+                    self.is_registered = True
+                    self.stop = Event()
+                    self.heartbeat_thread = Thread(target=self.keep_alive)
+                    self.heartbeat_thread.start()
+                    return True
+        except requests.exceptions.ConnectionError:
+            pass
+        return False
 
     def deregister(self):
-        self.stop.set()
-        self.heartbeat_thread.join()
-        self.is_registered = False
-        dereg_data = {'id': self.client_id}
-        requests.post(self.server_address + "/deregister", json=dereg_data)
+        if self.is_registered:
+            self.stop.set()
+            self.heartbeat_thread.join()
+            self.is_registered = False
+            dereg_data = {'id': self.client_id}
+            try:
+                requests.post(self.server_address + "/deregister", json=dereg_data)
+            except requests.exceptions.ConnectionError:
+                pass
 
     def keep_alive(self):
         heartbeat_data = {'id': self.client_id}
         while not self.stop.is_set():
             stop_flag = self.stop.wait(self.heartbeat_interval_seconds)
             if not stop_flag:
-                requests.post(self.server_address + "/heartbeat",
-                              json=heartbeat_data)
+                try:
+                    requests.post(self.server_address + "/heartbeat",
+                                  json=heartbeat_data)
+                except requests.exceptions.ConnectionError:
+                    pass
