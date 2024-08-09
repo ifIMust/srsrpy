@@ -3,11 +3,13 @@ from threading import Thread, Event
 
 
 class ServiceRegistryClient:
-    def __init__(self, server_address, client_name, client_address):
+    def __init__(self, server_address, client_name,
+                 client_address='', port=''):
         self.heartbeat_interval_seconds = 20
         self.server_address = server_address
         self.client_name = client_name
         self.client_address = client_address
+        self.client_port = port
 
         self.is_registered = False
         self.client_id = ""
@@ -15,7 +17,11 @@ class ServiceRegistryClient:
         self.stop = None
 
     def register(self):
-        reg_data = {'name': self.client_name, 'address': self.client_address}
+        reg_data = {
+            'name': self.client_name,
+            'address': self.client_address,
+            'port': self.client_port
+        }
         try:
             r = requests.post(self.server_address + "/register", json=reg_data)
             if r.status_code == requests.codes.ok:
